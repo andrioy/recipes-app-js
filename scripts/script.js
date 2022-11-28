@@ -1,5 +1,7 @@
 
 import fetchData, {apiBaseUrl, categoriesEndpoint} from "./fetchData.js";  
+import { readFromStorage, writeToStorage, storageKeys } from "./storageControl.js";
+
 const categoriesFilterDiv = document.getElementById("detailed-categories-filter");
 
  // 1. Fetch categories
@@ -25,8 +27,16 @@ function creatCategoryElement(categoryObject) {
 }
 
 async function main() {
-   const { categories } = await fetchData(apiBaseUrl + categoriesEndpoint);
-       categories.forEach(element => {
+    let categories = [];
+    categories = readFromStorage(storageKeys.categories);
+    if(!categories) {
+        const { categories : fetchedCategories } = await fetchData(apiBaseUrl + categoriesEndpoint);
+        categories = fetchedCategories;
+        writeToStorage(storageKeys.categories, categories);
+
+    }
+  
+    categories.forEach(element => {
           const newCategoryElement =  creatCategoryElement(element)
           categoriesFilterDiv.appendChild(newCategoryElement); 
         });
